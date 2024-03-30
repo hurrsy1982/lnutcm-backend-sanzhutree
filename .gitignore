@@ -1,0 +1,9 @@
+# 项目排除路径
+/.gradle/
+/build/
+/lnutcm-backend-sanzhu-annotation/build/
+/lnutcm-backend-sanzhu-annotation/build/classes/java/main/
+/lnutcm-backend-sanzhu-utils/build/
+/lnutcm-backend-sanzhu-utils/build/classes/java/main/
+/lnutcm-backend-sanzhu-web/build/
+/lnutcm-backend-sanzhu-web/build/classes/java/main/

@@ -1,0 +1,6 @@
+rootProject.name = 'lnutcm-backend-sanzhutree'
+include 'lnutcm-backend-sanzhu-utils'
+include 'lnutcm-backend-sanzhu-web'
+include 'lnutcm-backend-sanzhu-annotation'
+include 'lnutcm-backend-sanzhu-mybatis-generator-plugins'
+

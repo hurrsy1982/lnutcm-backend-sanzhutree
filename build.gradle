@@ -1,0 +1,63 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.2.4'
+    id 'io.spring.dependency-management' version '1.1.4'
+}
+bootJar {
+    enabled = false
+}
+
+jar {
+    enabled = true
+}
+
+group = 'com.lnutcm.sanzhu'
+version = '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+//subprojects 和 allprojects 一样，也是父 Project 的一个属性，
+//该属性会返回所有子项目。在父项目的 build.gradle 脚本里，
+//给 subprojects 传一个包含配置信息的闭包，
+//可以配置所有子项目共有的设置，比如共同的插件、repositories、依赖版本以及依赖配置：
+subprojects {
+    apply plugin: "java"
+    apply plugin: "org.springframework.boot"
+    apply plugin: "io.spring.dependency-management"
+
+
+    dependencies {
+        testImplementation platform('org.junit:junit-bom:5.10.2')
+        testImplementation 'org.junit.jupiter:junit-jupiter'
+        implementation 'com.alibaba.fastjson2:fastjson2:2.0.47'
+    }
+}
+project("lnutcm-backend-sanzhu-mybatis-generator-plugins"){
+    dependencies {
+        implementation 'org.mybatis.generator:mybatis-generator-core:1.4.2'
+    }
+}
+
+project("lnutcm-backend-sanzhu-web"){
+
+    dependencies {
+        implementation project(':lnutcm-backend-sanzhu-utils')
+        implementation project(':lnutcm-backend-sanzhu-annotation')
+        implementation 'org.springframework.boot:spring-boot-starter-web'
+        implementation ('org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.3'){
+            exclude group: 'com.zaxxer', module: 'HikariCP'
+        }//没有使用默认HikariCP数据库连接池时，需要排除对应的依赖；否则默认使用HikariCP，并报url没有找到属性值
+        implementation 'com.alibaba:druid-spring-boot-starter:1.2.22'
+
+    }
+}
+
+project("lnutcm-backend-sanzhu-utils"){
+    dependencies{}
+
+}
+
+test {
+    useJUnitPlatform()
+}

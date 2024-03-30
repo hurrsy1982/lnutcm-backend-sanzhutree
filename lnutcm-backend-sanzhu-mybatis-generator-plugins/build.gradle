@@ -1,0 +1,18 @@
+plugins {
+    id 'java'
+}
+
+group = 'com.lnutcm.sanzhu.mybatis.generator.plugs'
+version = '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+
+}
+
+test {
+    useJUnitPlatform()
+}
