@@ -2,7 +2,7 @@ plugins {
     id 'java'
 }
 
-group = 'com.lnutcm.sanzhu.mybatis.generator.plugs'
+group = 'com.lnutcm.sanzhu'
 version = '1.0-SNAPSHOT'
 
 repositories {
