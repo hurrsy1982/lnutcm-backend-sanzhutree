@@ -71,6 +71,7 @@ public class BaseEnHanceCommentGenerator extends DefaultCommentGenerator {
      * @param introspectedTable  the introspected table
      * @param introspectedColumn the introspected column
      */
+
     @Override
     public void addFieldComment(Field field, IntrospectedTable introspectedTable,
                                 IntrospectedColumn introspectedColumn) {
