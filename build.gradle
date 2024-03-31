@@ -36,6 +36,7 @@ subprojects {
 }
 project("lnutcm-backend-sanzhu-mybatis-generator-plugins"){
     dependencies {
+        implementation project(':lnutcm-backend-sanzhu-utils')
         implementation 'org.mybatis.generator:mybatis-generator-core:1.4.2'
         implementation 'org.slf4j:slf4j-api:2.0.12'
     }

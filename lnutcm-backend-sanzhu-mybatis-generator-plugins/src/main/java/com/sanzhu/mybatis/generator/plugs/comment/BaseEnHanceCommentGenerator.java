@@ -1,7 +1,7 @@
 package com.sanzhu.mybatis.generator.plugs.comment;
 
+import com.lnutcm.sanzhu.utils.date.DateUtils;
 import com.sanzhu.mybatis.generator.plugs.utils.CommentUtils;
-import org.mybatis.generator.api.CommentGenerator;
 import org.mybatis.generator.api.IntrospectedColumn;
 import org.mybatis.generator.api.IntrospectedTable;
 import org.mybatis.generator.api.dom.java.*;
@@ -10,12 +10,15 @@ import org.mybatis.generator.api.dom.kotlin.KotlinFunction;
 import org.mybatis.generator.api.dom.kotlin.KotlinProperty;
 import org.mybatis.generator.api.dom.kotlin.KotlinType;
 import org.mybatis.generator.api.dom.xml.XmlElement;
+import org.mybatis.generator.config.PropertyRegistry;
 import org.mybatis.generator.internal.DefaultCommentGenerator;
 import org.mybatis.generator.internal.util.StringUtility;
 
-import java.util.Arrays;
+
 import java.util.Properties;
 import java.util.Set;
+
+import static org.mybatis.generator.internal.util.StringUtility.isTrue;
 
 /**
  * 项目名称：springboot 后端脚手架<br>
@@ -24,7 +27,7 @@ import java.util.Set;
  * 作者：胡蓉蓉<br>
  * 模块：Mybatis Generator 逆向工程<br>
  * 描述：1.编写目的:自定义项目中逆向工程后的注释<br>
- *      2.功能分类:增强行级别注释、类级别注释、方法注释 <br>
+ * 2.功能分类:增强属性注释、类级别注释、方法注释 <br>
  * <p>
  * 备注：禁止商用<br>
  * ------------------------------------------------------------<br>
@@ -34,19 +37,28 @@ import java.util.Set;
  */
 
 public class BaseEnHanceCommentGenerator extends DefaultCommentGenerator {
+    private final Properties properties = new Properties();
 
     /**
-     * 抑制日期  默认false：不抑制
+     * 抑制日期  默认false：
      */
     private boolean suppressDate;
 
+    /**
+     * 抑制所有注释 默认false：
+     */
     private boolean suppressAllComments;
 
     /**
-     * If suppressAllComments is true, this option is ignored.
+     *
      */
     private boolean addRemarkComments;
 
+    public BaseEnHanceCommentGenerator() {
+        suppressDate = false;
+        suppressAllComments = false;
+        addRemarkComments = false;
+    }
 
     /**
      * Adds properties for this instance from any properties configured in the
@@ -58,38 +70,53 @@ public class BaseEnHanceCommentGenerator extends DefaultCommentGenerator {
      */
     @Override
     public void addConfigurationProperties(Properties properties) {
-
+        this.properties.putAll(properties);
+        this.suppressDate = StringUtility.isTrue
+                (PropertyRegistry.COMMENT_GENERATOR_SUPPRESS_DATE);
+        this.suppressAllComments = StringUtility.isTrue
+                (properties.getProperty(PropertyRegistry.COMMENT_GENERATOR_SUPPRESS_ALL_COMMENTS));
+        this.addRemarkComments = isTrue(properties.getProperty
+                (PropertyRegistry.COMMENT_GENERATOR_ADD_REMARK_COMMENTS));
     }
 
     /**
-     * This method should add a Javadoc comment to the specified field. The field is related to the
-     * specified table and is used to hold the value of the specified column.
-     * 方法应该为指定的字段添加一个 Javadoc 注释。该字段与指定的表相关，并用于保存指定列的值。
+     * Function name:    addFieldComment<br>
+     * Params:<br>
+     * param field              the field<br>
+     * param introspectedTable  the introspected table<br>
+     * param introspectedColumn the introspected column<br>
+     * Inside the function:
+     * 方法为指定的字段添加一个 Javadoc 注释。该字段与指定的表相关，并用于保存指定列的值。
      * <p><b>Important:</b> This method should add a the nonstandard JavaDoc tag "@mbg.generated" to
      * the comment. Without this tag, the Eclipse based Java merge feature will fail.
-     *
-     * @param field              the field
-     * @param introspectedTable  the introspected table
-     * @param introspectedColumn the introspected column
      */
 
     @Override
     public void addFieldComment(Field field, IntrospectedTable introspectedTable,
                                 IntrospectedColumn introspectedColumn) {
         // 添加字段注释
-
         String fieldRemarks = introspectedColumn.getRemarks();
         if (fieldRemarks != null) {
             if (this.suppressAllComments) {
                 return;
             }
             field.addJavaDocLine("/**"); //$NON-NLS-1$
-          String remarks=  CommentUtils.formatRemarks(this.addRemarkComments,introspectedColumn.getRemarks());
+            String remarks = CommentUtils.
+                    formatRemarks(this.addRemarkComments, introspectedColumn.getRemarks());
+            //取出对应字段注释 ,格式化字段对应列的注释
+            field.addJavaDocLine(" *  <p> Remark:" + remarks + "</p>");
+            //添加数据库对应字段与表信息
+            field.addJavaDocLine(" *  <p> Table:" + introspectedTable.getFullyQualifiedTable() + "</p>");
+            field.addJavaDocLine(" *  <p> Column:" + introspectedColumn.getActualColumnName());
+            if (!suppressDate) {
+                //添加对应时间
+                field.addJavaDocLine(" *  <p> AddTime:" + DateUtils.getStringCurrentDate() + "</p>");
+            }
 
+            field.addJavaDocLine(" */"); //$NON-NLS-1$
         }
         //super.addFieldComment(field, introspectedTable, introspectedColumn);
     }
-
 
 
     /**
@@ -100,7 +127,17 @@ public class BaseEnHanceCommentGenerator extends DefaultCommentGenerator {
      */
     @Override
     public void addFieldComment(Field field, IntrospectedTable introspectedTable) {
-        super.addFieldComment(field, introspectedTable);
+        if (this.suppressAllComments) {
+            return;
+        }
+        field.addJavaDocLine("/**"); //
+        //添加数据库对应字段与表信息
+        field.addJavaDocLine(" *  <p> Table:" + introspectedTable.getFullyQualifiedTable() + "</p>");
+        //添加对应时间
+        field.addJavaDocLine(" *  <p> AddTime:" + DateUtils.getStringCurrentDate() + "</p>");
+        field.addJavaDocLine(" */"); //$NON-NLS-1$
+
+        //super.addFieldComment(field, introspectedTable);
     }
 
     /**
@@ -112,9 +149,9 @@ public class BaseEnHanceCommentGenerator extends DefaultCommentGenerator {
      * <p>Because of difficulties with the Java file merger, the default implementation
      * of this method should NOT add comments.  Comments should only be added if
      * specifically requested by the user (for example, by enabling table remark comments).
-     *
-     * @param topLevelClass     the top level class
-     * @param introspectedTable the introspected table
+     * <p>
+     * param topLevelClass     the top level class
+     * param introspectedTable the introspected table
      */
     @Override
     public void addModelClassComment(TopLevelClass topLevelClass, IntrospectedTable introspectedTable) {
@@ -191,13 +228,30 @@ public class BaseEnHanceCommentGenerator extends DefaultCommentGenerator {
     }
 
     /**
+     * Function name:    addGeneralMethodComment<br>
+     * Params:<br>
+     * param  method            the method<br>
+     * param  introspectedTable the introspected table<br>
      * Adds the general method comment.
-     *
-     * @param method            the method
-     * @param introspectedTable the introspected table
      */
     @Override
     public void addGeneralMethodComment(Method method, IntrospectedTable introspectedTable) {
+        if (suppressAllComments) {
+            return;
+        }
+        String remarks = introspectedTable.getRemarks();
+        if (addRemarkComments && StringUtility.stringHasValue(remarks)) {
+            method.addJavaDocLine("/**"); //$NON-NLS-1$
+            if ("insert".equals(method.getName())) {
+
+            }
+            method.addJavaDocLine("" + introspectedTable.getFullyQualifiedTable());
+
+
+            method.addJavaDocLine(" */"); //$NON-NLS-1$
+
+        }
+
         super.addGeneralMethodComment(method, introspectedTable);
     }
 
