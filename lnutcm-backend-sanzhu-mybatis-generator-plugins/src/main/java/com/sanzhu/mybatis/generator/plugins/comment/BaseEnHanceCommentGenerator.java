@@ -1,7 +1,7 @@
-package com.sanzhu.mybatis.generator.plugs.comment;
+package com.sanzhu.mybatis.generator.plugins.comment;
 
 import com.lnutcm.sanzhu.utils.date.DateUtils;
-import com.sanzhu.mybatis.generator.plugs.utils.CommentUtils;
+import com.sanzhu.mybatis.generator.plugins.utils.CommentUtils;
 import org.mybatis.generator.api.IntrospectedColumn;
 import org.mybatis.generator.api.IntrospectedTable;
 import org.mybatis.generator.api.dom.java.*;
@@ -133,8 +133,11 @@ public class BaseEnHanceCommentGenerator extends DefaultCommentGenerator {
         field.addJavaDocLine("/**"); //
         //添加数据库对应字段与表信息
         field.addJavaDocLine(" *  <p> Table:" + introspectedTable.getFullyQualifiedTable() + "</p>");
-        //添加对应时间
-        field.addJavaDocLine(" *  <p> AddTime:" + DateUtils.getStringCurrentDate() + "</p>");
+        if (!suppressDate){
+            //添加对应时间
+            field.addJavaDocLine(" *  <p> AddTime:" + DateUtils.getStringCurrentDate() + "</p>");
+        }
+
         field.addJavaDocLine(" */"); //$NON-NLS-1$
 
         //super.addFieldComment(field, introspectedTable);
@@ -243,11 +246,40 @@ public class BaseEnHanceCommentGenerator extends DefaultCommentGenerator {
         if (addRemarkComments && StringUtility.stringHasValue(remarks)) {
             method.addJavaDocLine("/**"); //$NON-NLS-1$
             if ("insert".equals(method.getName())) {
+                method.addJavaDocLine(" * " + "<p>Add object-"+introspectedTable.getRemarks()+"</p>");
 
             }
-            method.addJavaDocLine("" + introspectedTable.getFullyQualifiedTable());
+            if ("insertSelective".equals(method.getName())) {
+                method.addJavaDocLine(" * " + "<p>选择性新增对象-"+introspectedTable.getRemarks()+"</p>");
+
+            }
+            if (method.getName().equalsIgnoreCase("selectByPrimaryKey")) {
+                method.addJavaDocLine("/**");
+                method.addJavaDocLine(" * " + "根据主键查询 - " + introspectedTable.getRemarks()+"");
+                method.addJavaDocLine(" */");
+            }
+            if (method.getName().equalsIgnoreCase("updateByPrimaryKeySelective")) {
+                method.addJavaDocLine("/**");
+                method.addJavaDocLine(" * " + "选择性更新 - " + introspectedTable.getRemarks());
+                method.addJavaDocLine(" */");
+            }
+            if (method.getName().equalsIgnoreCase("updateByPrimaryKey")) {
+                method.addJavaDocLine("/**");
+                method.addJavaDocLine(" * " + "根据主键更新 - " + introspectedTable.getRemarks());
+                method.addJavaDocLine(" */");
+            } else if (method.getName().equalsIgnoreCase("deleteByPrimaryKey")) {
+                method.addJavaDocLine("/**");
+                method.addJavaDocLine(" * " + "根据主键删除 - " + introspectedTable.getRemarks());
+                method.addJavaDocLine(" */");
+            }
+
+            if (!suppressDate){
+                //添加对应时间
+                method.addJavaDocLine(" *  <p> AddTime:" + DateUtils.getStringCurrentDate() + "</p>");
+            }
 
 
+            method.addJavaDocLine(" * " + "<p>Table:-"+introspectedTable.getFullyQualifiedTable()+"</p>");
             method.addJavaDocLine(" */"); //$NON-NLS-1$
 
         }

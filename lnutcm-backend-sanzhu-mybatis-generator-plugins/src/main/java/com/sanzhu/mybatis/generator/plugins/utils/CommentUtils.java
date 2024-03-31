@@ -1,4 +1,4 @@
-package com.sanzhu.mybatis.generator.plugs.utils;
+package com.sanzhu.mybatis.generator.plugins.utils;
 
 
 import org.mybatis.generator.internal.util.StringUtility;
