@@ -1,5 +1,6 @@
 package com.sanzhu.mybatis.generator.plugs.comment;
 
+import com.sanzhu.mybatis.generator.plugs.utils.CommentUtils;
 import org.mybatis.generator.api.CommentGenerator;
 import org.mybatis.generator.api.IntrospectedColumn;
 import org.mybatis.generator.api.IntrospectedTable;
@@ -22,8 +23,8 @@ import java.util.Set;
  * 日期：2024-03-23<br>
  * 作者：胡蓉蓉<br>
  * 模块：Mybatis Generator 逆向工程<br>
- * 描述：1.编写目的:抽离业务逻辑中关于文件处理的部分，避免业务逻辑代码被污染<br>
- * 2.函数分类:文件处理函数<br>
+ * 描述：1.编写目的:自定义项目中逆向工程后的注释<br>
+ *      2.功能分类:增强行级别注释、类级别注释、方法注释 <br>
  * <p>
  * 备注：禁止商用<br>
  * ------------------------------------------------------------<br>
@@ -83,22 +84,13 @@ public class BaseEnHanceCommentGenerator extends DefaultCommentGenerator {
                 return;
             }
             field.addJavaDocLine("/**"); //$NON-NLS-1$
-            remarks(introspectedColumn);
+          String remarks=  CommentUtils.formatRemarks(this.addRemarkComments,introspectedColumn.getRemarks());
 
         }
         //super.addFieldComment(field, introspectedTable, introspectedColumn);
     }
 
-    public String  remarks(IntrospectedColumn introspectedColumn) {
-        String remarks = introspectedColumn.getRemarks();
-        String result ="";
-        if (addRemarkComments && StringUtility.stringHasValue(remarks)) {
-            String[] remarkLines = remarks.split(System.getProperty("line.separator")); //$NON-NLS-1$
-             result = Arrays.stream(remarkLines).
-                    reduce("", (partialString, element) -> partialString + "," + element);
-        }
-        return result;
-    }
+
 
     /**
      * Adds the field comment.
