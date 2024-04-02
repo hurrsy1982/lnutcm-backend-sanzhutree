@@ -87,8 +87,6 @@ public class BaseEnHanceCommentGenerator extends DefaultCommentGenerator {
      * param introspectedColumn the introspected column<br>
      * Inside the function:
      * 方法为指定的字段添加一个 Javadoc 注释。该字段与指定的表相关，并用于保存指定列的值。
-     * <p><b>Important:</b> This method should add a the nonstandard JavaDoc tag "@mbg.generated" to
-     * the comment. Without this tag, the Eclipse based Java merge feature will fail.
      */
 
     @Override
@@ -104,13 +102,13 @@ public class BaseEnHanceCommentGenerator extends DefaultCommentGenerator {
             String remarks = CommentUtils.
                     formatRemarks(this.addRemarkComments, introspectedColumn.getRemarks());
             //取出对应字段注释 ,格式化字段对应列的注释
-            field.addJavaDocLine(" *  <p> Remark:" + remarks + "</p>");
+            field.addJavaDocLine(" *  <p> 字段备注:" + remarks + "</p>");
             //添加数据库对应字段与表信息
-            field.addJavaDocLine(" *  <p> Table:" + introspectedTable.getFullyQualifiedTable() + "</p>");
-            field.addJavaDocLine(" *  <p> Column:" + introspectedColumn.getActualColumnName());
+            field.addJavaDocLine(" *  <p> 表:" + introspectedTable.getFullyQualifiedTable() + "</p>");
+            field.addJavaDocLine(" *  <p> 列:" + introspectedColumn.getActualColumnName());
             if (!suppressDate) {
                 //添加对应时间
-                field.addJavaDocLine(" *  <p> AddTime:" + DateUtils.getStringCurrentDate() + "</p>");
+                field.addJavaDocLine(" *  <p> 添加时间:" + DateUtils.getStringCurrentDate() + "</p>");
             }
 
             field.addJavaDocLine(" */"); //$NON-NLS-1$
@@ -120,10 +118,12 @@ public class BaseEnHanceCommentGenerator extends DefaultCommentGenerator {
 
 
     /**
-     * Adds the field comment.
-     *
-     * @param field             the field
-     * @param introspectedTable the introspected table
+     * Function name:    addFieldComment<br>
+     * Params:<br>
+     * param field              the field<br>
+     * param introspectedTable  the introspected table<br>
+     * Inside the function:
+     * 方法为指定的静态字段添加一个 Javadoc 注释。该字段与指定的表相关，并用于保存指定列的值。
      */
     @Override
     public void addFieldComment(Field field, IntrospectedTable introspectedTable) {
@@ -231,11 +231,12 @@ public class BaseEnHanceCommentGenerator extends DefaultCommentGenerator {
     }
 
     /**
-     * Function name:    addGeneralMethodComment<br>
+     * Function name:addGeneralMethodComment<br>
      * Params:<br>
      * param  method            the method<br>
      * param  introspectedTable the introspected table<br>
-     * Adds the general method comment.
+     * Inside the function:<br>
+     * 为生成的Mapper的方法添加注释<br>
      */
     @Override
     public void addGeneralMethodComment(Method method, IntrospectedTable introspectedTable) {
@@ -245,45 +246,57 @@ public class BaseEnHanceCommentGenerator extends DefaultCommentGenerator {
         String remarks = introspectedTable.getRemarks();
         if (addRemarkComments && StringUtility.stringHasValue(remarks)) {
             method.addJavaDocLine("/**"); //$NON-NLS-1$
-            if ("insert".equals(method.getName())) {
-                method.addJavaDocLine(" * " + "<p>Add object-"+introspectedTable.getRemarks()+"</p>");
+            if ("insert".equalsIgnoreCase(method.getName())) {
+                method.addJavaDocLine(" * " + "<p>新增对象-"+introspectedTable.getRemarks()+"</p>");
 
             }
-            if ("insertSelective".equals(method.getName())) {
+            if ("insertSelective".equalsIgnoreCase(method.getName())) {
                 method.addJavaDocLine(" * " + "<p>选择性新增对象-"+introspectedTable.getRemarks()+"</p>");
 
             }
-            if (method.getName().equalsIgnoreCase("selectByPrimaryKey")) {
-                method.addJavaDocLine("/**");
-                method.addJavaDocLine(" * " + "根据主键查询 - " + introspectedTable.getRemarks()+"");
-                method.addJavaDocLine(" */");
+            if ("selectByPrimaryKey".equalsIgnoreCase(method.getName())) {
+                method.addJavaDocLine(" * " + "<p>根据主键查询 - " + introspectedTable.getRemarks()+"</p>");
+
             }
-            if (method.getName().equalsIgnoreCase("updateByPrimaryKeySelective")) {
-                method.addJavaDocLine("/**");
-                method.addJavaDocLine(" * " + "选择性更新 - " + introspectedTable.getRemarks());
-                method.addJavaDocLine(" */");
+            if ("selectByExample".equalsIgnoreCase(method.getName())) {
+                method.addJavaDocLine(" * " + "<p>根据条件查询 - " + introspectedTable.getRemarks()+"</p>");
+
             }
-            if (method.getName().equalsIgnoreCase("updateByPrimaryKey")) {
-                method.addJavaDocLine("/**");
-                method.addJavaDocLine(" * " + "根据主键更新 - " + introspectedTable.getRemarks());
-                method.addJavaDocLine(" */");
-            } else if (method.getName().equalsIgnoreCase("deleteByPrimaryKey")) {
-                method.addJavaDocLine("/**");
-                method.addJavaDocLine(" * " + "根据主键删除 - " + introspectedTable.getRemarks());
-                method.addJavaDocLine(" */");
+            if ("updateByPrimaryKeySelective".equalsIgnoreCase(method.getName())) {
+
+                method.addJavaDocLine(" * " + "<p>根据主键选择性更新 - " + introspectedTable.getRemarks()+"</p>");
+
+            }
+            if ("updateByExampleSelective".equalsIgnoreCase(method.getName())) {
+                method.addJavaDocLine(" * " + "<p>根据条件选择性更新 - " + introspectedTable.getRemarks()+"</p>");
             }
 
-            if (!suppressDate){
-                //添加对应时间
+            if ("updateByExampleSelective".equalsIgnoreCase(method.getName())) {
+                method.addJavaDocLine(" * " + "<p>根据条件选择性更新 - " + introspectedTable.getRemarks()+"</p>");
+            }
+
+            if ("updateByExample".equalsIgnoreCase(method.getName())) {
+                method.addJavaDocLine(" * " + "<p>根据条件更新 - " + introspectedTable.getRemarks()+"</p>");
+            }
+            if ("deleteByExample".equalsIgnoreCase(method.getName())) {
+                method.addJavaDocLine(" * " + "根据条件删除 - " + introspectedTable.getRemarks());
+            }
+            if ("deleteByPrimaryKey".equalsIgnoreCase(method.getName())) {
+                method.addJavaDocLine(" * " + "根据主键删除 - " + introspectedTable.getRemarks());
+            }
+
+            if (method.getName().equalsIgnoreCase("countByExample")) {
+                method.addJavaDocLine(" * " + "根据条件查询数量 - " + introspectedTable.getRemarks());
+
+            }
+
+            if (!suppressDate){//添加对应时间
                 method.addJavaDocLine(" *  <p> AddTime:" + DateUtils.getStringCurrentDate() + "</p>");
             }
-
-
             method.addJavaDocLine(" * " + "<p>Table:-"+introspectedTable.getFullyQualifiedTable()+"</p>");
             method.addJavaDocLine(" */"); //$NON-NLS-1$
 
         }
-
         super.addGeneralMethodComment(method, introspectedTable);
     }
 
