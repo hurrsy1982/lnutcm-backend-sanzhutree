@@ -74,5 +74,30 @@ public class FileUtils {
 
     }
 
+    /** 截取文件后缀 */
+    public static String getFileExt(String filePath) {
+
+        int index = filePath.lastIndexOf(".");
+        if (index < 0 || index + 1 == filePath.length()) {
+            return "";
+        } else {
+            return filePath.substring(index + 1);
+        }
+
+    }
+
+    /** 截取文件的保存路径 ,参数:路径+文件名(文件的完整路径) */
+
+    public static String getFilePath(String fileFullPath) {
+        int index = fileFullPath.lastIndexOf("/");
+        if (index < 0) {
+            return "";
+        } else {
+            String fileDir = fileFullPath.substring(0, index);
+            return fileDir;
+        }
+
+    }
+
 
 }

@@ -62,7 +62,8 @@ public class RenameJavaMapperPlugin extends PluginAdapter {
         introspectedTable.setMyBatis3JavaMapperType(oldType);
 
         //获取xml 中
-        introspectedTable.getMyBatis3FallbackSqlMapNamespace();
+        String oldSqlXmlType =  introspectedTable.getMyBatis3FallbackSqlMapNamespace();
+        Matcher matcherXml = pattern.matcher(oldSqlXmlType);
 
 
 

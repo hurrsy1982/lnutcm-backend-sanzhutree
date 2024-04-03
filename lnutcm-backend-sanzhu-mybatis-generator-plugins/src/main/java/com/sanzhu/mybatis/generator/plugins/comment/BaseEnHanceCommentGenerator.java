@@ -72,10 +72,10 @@ public class BaseEnHanceCommentGenerator extends DefaultCommentGenerator {
     public void addConfigurationProperties(Properties properties) {
         this.properties.putAll(properties);
         this.suppressDate = StringUtility.isTrue
-                (PropertyRegistry.COMMENT_GENERATOR_SUPPRESS_DATE);
+                (properties.getProperty(PropertyRegistry.COMMENT_GENERATOR_SUPPRESS_DATE));
         this.suppressAllComments = StringUtility.isTrue
                 (properties.getProperty(PropertyRegistry.COMMENT_GENERATOR_SUPPRESS_ALL_COMMENTS));
-        this.addRemarkComments = isTrue(properties.getProperty
+        this.addRemarkComments = StringUtility.isTrue(properties.getProperty
                 (PropertyRegistry.COMMENT_GENERATOR_ADD_REMARK_COMMENTS));
     }
 
@@ -95,7 +95,7 @@ public class BaseEnHanceCommentGenerator extends DefaultCommentGenerator {
         // 添加字段注释
         String fieldRemarks = introspectedColumn.getRemarks();
         if (fieldRemarks != null) {
-            if (this.suppressAllComments) {
+            if (this.suppressAllComments || !addRemarkComments) {
                 return;
             }
             field.addJavaDocLine("/**"); //$NON-NLS-1$
@@ -127,7 +127,7 @@ public class BaseEnHanceCommentGenerator extends DefaultCommentGenerator {
      */
     @Override
     public void addFieldComment(Field field, IntrospectedTable introspectedTable) {
-        if (this.suppressAllComments) {
+        if (this.suppressAllComments|| !addRemarkComments) {
             return;
         }
         field.addJavaDocLine("/**"); //
@@ -240,7 +240,7 @@ public class BaseEnHanceCommentGenerator extends DefaultCommentGenerator {
      */
     @Override
     public void addGeneralMethodComment(Method method, IntrospectedTable introspectedTable) {
-        if (suppressAllComments) {
+        if (suppressAllComments|| !addRemarkComments) {
             return;
         }
         String remarks = introspectedTable.getRemarks();
@@ -248,7 +248,6 @@ public class BaseEnHanceCommentGenerator extends DefaultCommentGenerator {
             method.addJavaDocLine("/**"); //$NON-NLS-1$
             if ("insert".equalsIgnoreCase(method.getName())) {
                 method.addJavaDocLine(" * " + "<p>新增对象-"+introspectedTable.getRemarks()+"</p>");
-
             }
             if ("insertSelective".equalsIgnoreCase(method.getName())) {
                 method.addJavaDocLine(" * " + "<p>选择性新增对象-"+introspectedTable.getRemarks()+"</p>");
@@ -287,7 +286,6 @@ public class BaseEnHanceCommentGenerator extends DefaultCommentGenerator {
 
             if (method.getName().equalsIgnoreCase("countByExample")) {
                 method.addJavaDocLine(" * " + "根据条件查询数量 - " + introspectedTable.getRemarks());
-
             }
 
             if (!suppressDate){//添加对应时间
