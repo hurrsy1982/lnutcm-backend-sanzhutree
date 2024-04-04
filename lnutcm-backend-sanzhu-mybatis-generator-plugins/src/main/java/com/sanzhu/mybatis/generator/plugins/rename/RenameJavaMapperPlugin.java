@@ -15,8 +15,8 @@ import static org.mybatis.generator.internal.util.messages.Messages.getString;
  * 日期：2024-04-01<br>
  * 作者：胡蓉蓉<br>
  * 模块：Mybatis Generator 逆向工程-RenameJavaMapperPlugin<br>
- * 描述：1.编写目的:自定义项目中逆向工程中Mapper的生成位置<br>
- *      2.实现需求:修改Mapper的生成位置<br>
+ * 描述：1.编写目的:自定义项目中逆向工程中Mapper的结尾<br>
+ *      2.实现需求:修改JAVA Mapper的文件名后缀 例如:默认以Mapper结尾，修改成以Dao 结<br>
  * <p>
  * 备注：禁止商用<br>
  * ------------------------------------------------------------<br>
@@ -52,20 +52,29 @@ public class RenameJavaMapperPlugin extends PluginAdapter {
 
         return valid;
     }
+    /**
+     * Function name:initialized<br>
+     * Params:<br>
+     * param  introspectedTable the introspected table<br>
+     * Inside the function:<br>
+     * 方法在对内省表调用getGeneratedXXXFiles方法之前调用的。插件
+     * 可以实现此方法来覆盖任何默认属性，或更改数据库的结果内省，在任何代码生成活动发生之前。<br>
+     */
     @Override
     public void initialized(IntrospectedTable introspectedTable) {
         //首先获取Mapper文件全路径
-
+        //
         String oldType = introspectedTable.getMyBatis3JavaMapperType();//获得*Mapper文件全路径
         Matcher matcher = pattern.matcher(oldType);
         oldType = matcher.replaceAll(replaceString);
         introspectedTable.setMyBatis3JavaMapperType(oldType);
 
-        //获取xml 中
+        //获取命名空间
         String oldSqlXmlType =  introspectedTable.getMyBatis3FallbackSqlMapNamespace();
         Matcher matcherXml = pattern.matcher(oldSqlXmlType);
-
-
+        oldType = matcher.replaceAll(replaceString);
+        introspectedTable.setMyBatis3FallbackSqlMapNamespace(oldType);
+        //introspectedTable.setMyBatis3FallbackSqlMapNamespace();
 
     }
 }
