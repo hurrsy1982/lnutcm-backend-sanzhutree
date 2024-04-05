@@ -1,5 +1,7 @@
 package com.sanzhu.mybatis.generator.plugins.rename;
 
+
+import com.sanzhu.mybatis.generator.plugins.utils.CommentUtils;
 import org.mybatis.generator.api.IntrospectedColumn;
 import org.mybatis.generator.api.IntrospectedTable;
 import org.mybatis.generator.api.PluginAdapter;
@@ -8,10 +10,12 @@ import org.mybatis.generator.api.dom.java.FullyQualifiedJavaType;
 import org.mybatis.generator.api.dom.java.Method;
 import org.mybatis.generator.api.dom.java.TopLevelClass;
 import org.mybatis.generator.internal.util.StringUtility;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
-import static org.mybatis.generator.internal.util.StringUtility.stringHasValue;
+
 
 /**
  * 项目名称：springboot 后端脚手架<br>
@@ -30,12 +34,13 @@ import static org.mybatis.generator.internal.util.StringUtility.stringHasValue;
  */
 public class GenerateSpringDocPlugin extends PluginAdapter {
 
+    private final static Logger logger
+            = LoggerFactory.getLogger(GenerateSpringDocPlugin.class);
+
     /**
      * 抑制所有注解 默认false：
      */
     private boolean suppressSpringDocAnnotation;
-
-
 
 
     /***/
@@ -71,9 +76,7 @@ public class GenerateSpringDocPlugin extends PluginAdapter {
 
         this.suppressSpringDocAnnotation = StringUtility.isTrue
                 (properties.getProperty("suppressAnnotation")); //是否抑制Swagger注解
-        boolean valid = !suppressSpringDocAnnotation ;//判断是否抑制注解
-
-
+        boolean valid = !suppressSpringDocAnnotation;//判断是否抑制注解
         return valid;
     }
 
@@ -95,9 +98,32 @@ public class GenerateSpringDocPlugin extends PluginAdapter {
      * plugins.
      */
     @Override
-    public boolean modelFieldGenerated(Field field, TopLevelClass topLevelClass, IntrospectedColumn introspectedColumn, IntrospectedTable introspectedTable, ModelClassType modelClassType) {
+    public boolean modelFieldGenerated(Field field, TopLevelClass topLevelClass,
+                                       IntrospectedColumn introspectedColumn,
+                                       IntrospectedTable introspectedTable,
+                                       ModelClassType modelClassType) {
+       var annotation="";
 
+        if (introspectedColumn.getRemarks() != null) {
+            var remarks = CommentUtils.
+                    formatRemarks(true, introspectedColumn.getRemarks());//格式化注释
+         annotation="@Schema(name=\"" + field.getName()+
+                "\"" + " " + "description=" + "\""+remarks
+                + "\""+ " "
+                + ")";
+         if(!introspectedColumn.isNullable()){
+             annotation="@Schema(name=\"" + field.getName()+
+                     "\"" + " " + "description=" + "\""+remarks
+                     + "\""+ " requiredMode= Schema.RequiredMode.REQUIRED"
+                     + ")";
 
+         }
+        }
+        field.addAnnotation(annotation);
+        //topLevelClass.addImportedType
+         //       (new FullyQualifiedJavaType(API_MODEL_SCHEMA_FULL_CLASS_NAME));
+        //introspectedColumn.isNullable()
+        // @Schema(name="employeeId" ,description="雇员ID" ,type="Long", requiredMode= Schema.RequiredMode.REQUIRED)
         return super.modelFieldGenerated(field, topLevelClass, introspectedColumn, introspectedTable, modelClassType);
     }
 
@@ -120,9 +146,12 @@ public class GenerateSpringDocPlugin extends PluginAdapter {
      */
     @Override
     public boolean modelBaseRecordClassGenerated(TopLevelClass topLevelClass, IntrospectedTable introspectedTable) {
-
+        var remarks = CommentUtils.
+                formatRemarks(true, introspectedTable.getRemarks());//格式化注释
         topLevelClass.
-                addAnnotation("@Schema(name=\""+topLevelClass.getClass().getName()+"\""+" "+"description="+"");//在类上加上注解@Schema
+                addAnnotation("@Schema(name=\"" + topLevelClass.getClass().getName() +
+                        "\"" + " " + "description=" + "\""+remarks
+                        + "\"");//在类上加上注解@Schema
         topLevelClass.addImportedType
                 (new FullyQualifiedJavaType(API_MODEL_SCHEMA_FULL_CLASS_NAME));
         return super.modelBaseRecordClassGenerated(topLevelClass, introspectedTable);
@@ -150,8 +179,7 @@ public class GenerateSpringDocPlugin extends PluginAdapter {
     public boolean modelSetterMethodGenerated(Method method,
                                               TopLevelClass topLevelClass, IntrospectedColumn introspectedColumn,
                                               IntrospectedTable introspectedTable, ModelClassType modelClassType) {
-        //introspectedColumn.isNullable()
-        // @Schema(name="employeeId" ,description="雇员ID" ,type="Long", requiredMode= Schema.RequiredMode.REQUIRED)
+
         return true;
     }
 }

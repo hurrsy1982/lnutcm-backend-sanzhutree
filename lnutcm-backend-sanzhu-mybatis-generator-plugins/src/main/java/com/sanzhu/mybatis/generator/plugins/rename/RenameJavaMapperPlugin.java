@@ -16,7 +16,7 @@ import static org.mybatis.generator.internal.util.messages.Messages.getString;
  * 作者：胡蓉蓉<br>
  * 模块：Mybatis Generator 逆向工程-RenameJavaMapperPlugin<br>
  * 描述：1.编写目的:自定义项目中逆向工程中Mapper的结尾<br>
- *      2.实现需求:修改JAVA Mapper的文件名后缀 例如:默认以Mapper结尾，修改成以Dao 结<br>
+ *      2.实现需求:修改JAVA Mapper的文件名结尾 例如:默认以Mapper结尾，修改成以Dao 结尾<br>
  * <p>
  * 备注：禁止商用<br>
  * ------------------------------------------------------------<br>
@@ -72,9 +72,8 @@ public class RenameJavaMapperPlugin extends PluginAdapter {
         //获取命名空间
         String oldSqlXmlType =  introspectedTable.getMyBatis3FallbackSqlMapNamespace();
         Matcher matcherXml = pattern.matcher(oldSqlXmlType);
-        oldType = matcher.replaceAll(replaceString);
-        introspectedTable.setMyBatis3FallbackSqlMapNamespace(oldType);
-        //introspectedTable.setMyBatis3FallbackSqlMapNamespace();
+        oldSqlXmlType = matcherXml.replaceAll(replaceString);
+        introspectedTable.setMyBatis3FallbackSqlMapNamespace(oldSqlXmlType);
 
     }
 }

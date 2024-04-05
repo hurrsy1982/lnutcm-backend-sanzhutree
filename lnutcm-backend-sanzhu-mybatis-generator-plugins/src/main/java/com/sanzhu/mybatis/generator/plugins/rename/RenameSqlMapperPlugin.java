@@ -16,8 +16,8 @@ import static org.mybatis.generator.internal.util.messages.Messages.getString;
  * 日期：2024-04-01<br>
  * 作者：胡蓉蓉<br>
  * 模块：Mybatis Generator 逆向工程-RenameJavaMapperPlugin<br>
- * 描述：1.编写目的:自定义项目中逆向工程中XML的后缀<br>
- *      2.实现需求:修改Xml的文件名后缀 ，例如:默认以Mapper结尾，修改成以Dao 结尾<br>
+ * 描述：1.编写目的:自定义项目中逆向工程中XML的名称结尾<br>
+ *      2.实现需求:修改Xml的文件名结尾 ，例如:默认以Mapper结尾，修改成以Dao 结尾<br>
  * <p>
  * 备注：禁止商用<br>
  * ------------------------------------------------------------<br>

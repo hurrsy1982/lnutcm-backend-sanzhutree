@@ -32,6 +32,8 @@ public class CommentUtils {
             String[] remarkLines = remarks.split(System.getProperty("line.separator")); //$NON-NLS-1$
             result = Arrays.stream(remarkLines).
                     reduce("", (partialString, element) -> partialString + "," + element);
+            result.replace("\\"," ");
+
         }
         return result;
     }
