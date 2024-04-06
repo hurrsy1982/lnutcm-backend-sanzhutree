@@ -7,7 +7,6 @@ import org.mybatis.generator.api.IntrospectedTable;
 import org.mybatis.generator.api.PluginAdapter;
 import org.mybatis.generator.api.dom.java.Field;
 import org.mybatis.generator.api.dom.java.FullyQualifiedJavaType;
-import org.mybatis.generator.api.dom.java.Method;
 import org.mybatis.generator.api.dom.java.TopLevelClass;
 import org.mybatis.generator.internal.util.StringUtility;
 import org.slf4j.Logger;
@@ -157,29 +156,6 @@ public class GenerateSpringDocPlugin extends PluginAdapter {
         return super.modelBaseRecordClassGenerated(topLevelClass, introspectedTable);
     }
 
-    /**
-     * This method is called after the setter, or mutator, method is generated
-     * for a specific column in a table.
-     *
-     * @param method             the setter, or mutator, method generated for the specified
-     *                           column
-     * @param topLevelClass      the partially implemented model class. You can add additional
-     *                           imported classes to the implementation class if necessary.
-     * @param introspectedColumn The class containing information about the column related
-     *                           to this field as introspected from the database
-     * @param introspectedTable  The class containing information about the table as
-     *                           introspected from the database
-     * @param modelClassType     the type of class that the field is generated for
-     * @return true if the method should be generated, false if the generated
-     * method should be ignored. In the case of multiple plugins, the
-     * first plugin returning false will disable the calling of further
-     * plugins.
-     */
-    @Override
-    public boolean modelSetterMethodGenerated(Method method,
-                                              TopLevelClass topLevelClass, IntrospectedColumn introspectedColumn,
-                                              IntrospectedTable introspectedTable, ModelClassType modelClassType) {
 
-        return true;
-    }
+
 }

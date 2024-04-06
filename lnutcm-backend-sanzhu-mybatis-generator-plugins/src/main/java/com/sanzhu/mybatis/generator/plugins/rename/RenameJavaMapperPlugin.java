@@ -63,13 +63,16 @@ public class RenameJavaMapperPlugin extends PluginAdapter {
     @Override
     public void initialized(IntrospectedTable introspectedTable) {
         //首先获取Mapper文件全路径
-        //
+        //进行正则匹配，然后替换Mapper名称
+        //重新设置Mapper名称
         String oldType = introspectedTable.getMyBatis3JavaMapperType();//获得*Mapper文件全路径
         Matcher matcher = pattern.matcher(oldType);
         oldType = matcher.replaceAll(replaceString);
         introspectedTable.setMyBatis3JavaMapperType(oldType);
 
         //获取命名空间
+        //进行正则匹配，然后替换Xml名称
+        //重新设置Xml名称
         String oldSqlXmlType =  introspectedTable.getMyBatis3FallbackSqlMapNamespace();
         Matcher matcherXml = pattern.matcher(oldSqlXmlType);
         oldSqlXmlType = matcherXml.replaceAll(replaceString);

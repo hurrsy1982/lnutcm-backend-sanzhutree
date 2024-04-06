@@ -1,6 +1,6 @@
 package com.sanzhu.mybatis.generator.plugins.extend;
 
-import com.lnutcm.sanzhu.utils.file.PackageUtils;
+
 import org.mybatis.generator.api.GeneratedJavaFile;
 import org.mybatis.generator.api.GeneratedXmlFile;
 import org.mybatis.generator.api.IntrospectedTable;
@@ -8,6 +8,11 @@ import org.mybatis.generator.api.PluginAdapter;
 import org.mybatis.generator.api.dom.java.FullyQualifiedJavaType;
 import org.mybatis.generator.api.dom.java.Interface;
 import org.mybatis.generator.api.dom.java.JavaVisibility;
+import org.mybatis.generator.api.dom.xml.Attribute;
+import org.mybatis.generator.api.dom.xml.Document;
+import org.mybatis.generator.api.dom.xml.XmlElement;
+import org.mybatis.generator.codegen.XmlConstants;
+import org.mybatis.generator.config.PropertyRegistry;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -89,7 +94,8 @@ public class MapperExtendPlugin extends PluginAdapter {
                     new FullyQualifiedJavaType("org.apache.ibatis.annotations.Mapper")); //$NON-NLS-1$
             interfaze.addAnnotation("@Mapper"); //$NON-NLS-1$
             GeneratedJavaFile generatedJavaFile = new GeneratedJavaFile(interfaze, targetPackage
-                    , context.getJavaFormatter());
+                    ,  context.getProperty
+                    (PropertyRegistry.CONTEXT_JAVA_FILE_ENCODING),context.getJavaFormatter());
             generatedJavaFileList.add(generatedJavaFile);
         }
 
@@ -109,7 +115,44 @@ public class MapperExtendPlugin extends PluginAdapter {
      */
     @Override
     public List<GeneratedXmlFile> contextGenerateAdditionalXmlFiles(IntrospectedTable introspectedTable) {
-        return super.contextGenerateAdditionalXmlFiles(introspectedTable);
+        List<GeneratedXmlFile> answer = new ArrayList<>(1);
+
+        String projectType = System.getProperty("user.dir");//获取项目根目录
+        String targetProjectType =
+                context.getJavaClientGeneratorConfiguration().getTargetProject();
+        String targetPackage = context.getJavaClientGeneratorConfiguration().getTargetPackage();//获取package文件位置
+        String domainObjectName = introspectedTable.getTableConfiguration().getDomainObjectName();
+        String addtionalType = targetPackage + "." + domainObjectName + endString;
+
+        String fullXMLMapperType =
+                projectType.replaceAll("\\\\", "/") + File.separatorChar
+                        +targetProjectType.replaceAll("\\.", "/") + File.separatorChar
+                        +targetPackage.replaceAll("\\.", "/")
+                        + domainObjectName + endString
+                        +".xml";
+        File fullJavaMapperFile=new File(fullXMLMapperType);//得到欲生成的xml
+        if(!fullJavaMapperFile.exists()){
+            Document document = new Document(
+                    XmlConstants.MYBATIS3_MAPPER_CONFIG_PUBLIC_ID,
+                    XmlConstants.MYBATIS3_MAPPER_CONFIG_SYSTEM_ID);
+            XmlElement root = new XmlElement("mapper"); //$NON-NLS-1$
+            document.setRootElement(root);
+            root.addAttribute(new Attribute("namespace",
+                    addtionalType)); //$NON-NLS-1$
+            String fileNameExt =domainObjectName + endString
+                    +".xml";
+            GeneratedXmlFile gxf = new GeneratedXmlFile(document, fileNameExt,
+                    targetPackage, targetProjectType,
+                    false, context.getXmlFormatter());
+
+
+            answer.add(gxf);
+
+        }
+
+        return answer;
     }
+
+
 
 }
