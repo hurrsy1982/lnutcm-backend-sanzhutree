@@ -289,13 +289,13 @@ public class BaseEnHanceCommentGenerator extends DefaultCommentGenerator {
             }
 
             if (!suppressDate){//添加对应时间
-                method.addJavaDocLine(" *  <p> AddTime:" + DateUtils.getStringCurrentDate() + "</p>");
+                method.addJavaDocLine(" *  <p> 添加时间:" + DateUtils.getStringCurrentDate() + "</p>");
             }
-            method.addJavaDocLine(" * " + "<p>Table:-"+introspectedTable.getFullyQualifiedTable()+"</p>");
+            method.addJavaDocLine(" * " + "<p>表:-"+introspectedTable.getFullyQualifiedTable()+"</p>");
             method.addJavaDocLine(" */"); //$NON-NLS-1$
-
+           // super.addGeneralMethodComment(method, introspectedTable);
         }
-        super.addGeneralMethodComment(method, introspectedTable);
+
     }
 
     /**
