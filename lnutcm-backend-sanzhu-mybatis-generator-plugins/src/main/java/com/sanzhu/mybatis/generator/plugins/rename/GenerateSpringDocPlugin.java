@@ -57,17 +57,15 @@ public class GenerateSpringDocPlugin extends PluginAdapter {
 
 
     /**
-     * This method is called after all the setXXX methods are called, but before
-     * any other method is called. This allows the plugin to determine whether
-     * it can run or not. For example, if the plugin requires certain properties
-     * to be set, and the properties are not set, then the plugin is invalid and
-     * will not run.
-     *
-     * @param warnings add strings to this list to specify warnings. For example, if
-     *                 the plugin is invalid, you should specify why. Warnings are
-     *                 reported to users after the completion of the run.
-     * @return true if the plugin is in a valid state. Invalid plugins will not
-     * be called
+     * Function name:validate<br>
+     * Inside the function:<br>
+     *                 方法在对内省表调用setXXX方法之后调用的。<br>
+     *                 判断该插件是否能够生效。<br>
+     * return:boolean<br>
+     * Params:<br>
+     * @param warnings List<String> (向列表中添加字符串以指定警告。例如，如果<br>
+     *                 插件无效，您应该指定原因。警告为在运行完成后报告给用户)<br>
+
      */
 
     @Override

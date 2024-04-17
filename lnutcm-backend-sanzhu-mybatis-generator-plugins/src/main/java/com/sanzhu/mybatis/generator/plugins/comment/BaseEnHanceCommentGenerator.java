@@ -50,7 +50,7 @@ public class BaseEnHanceCommentGenerator extends DefaultCommentGenerator {
     private boolean suppressAllComments;
 
     /**
-     *
+     * 使用自定义模块 默认false;
      */
     private boolean addRemarkComments;
 
@@ -82,11 +82,12 @@ public class BaseEnHanceCommentGenerator extends DefaultCommentGenerator {
     /**
      * Function name:    addFieldComment<br>
      * Params:<br>
-     * param field              the field<br>
-     * param introspectedTable  the introspected table<br>
-     * param introspectedColumn the introspected column<br>
-     * Inside the function:
-     * 方法为指定的字段添加一个 Javadoc 注释。该字段与指定的表相关，并用于保存指定列的值。
+     *
+     * @param field              the field<br>
+     * @param introspectedTable  the introspected table<br>
+     * @param introspectedColumn the introspected column<br>
+     *                           Inside the function:<br>
+     *                           方法为指定的字段添加一个 Javadoc 注释。该字段与指定的表相关，并用于保存指定列的值。
      */
 
     @Override
@@ -108,7 +109,7 @@ public class BaseEnHanceCommentGenerator extends DefaultCommentGenerator {
             field.addJavaDocLine(" *  <p> 列:" + introspectedColumn.getActualColumnName());
             if (!suppressDate) {
                 //添加对应时间
-                field.addJavaDocLine(" *  <p> 添加时间:" + DateUtils.getStringCurrentDate() + "</p>");
+                field.addJavaDocLine(" *  <p>时间:" + DateUtils.getStringCurrentDate() + "</p>");
             }
 
             field.addJavaDocLine(" */"); //$NON-NLS-1$
@@ -120,22 +121,23 @@ public class BaseEnHanceCommentGenerator extends DefaultCommentGenerator {
     /**
      * Function name:    addFieldComment<br>
      * Params:<br>
-     * param field              the field<br>
-     * param introspectedTable  the introspected table<br>
-     * Inside the function:
-     * 方法为指定的静态字段添加一个 Javadoc 注释。该字段与指定的表相关，并用于保存指定列的值。
+     *
+     * @param field             the field<br>
+     * @param introspectedTable the introspected table<br>
+     *                          Inside the function:<br>
+     *                          方法为指定的静态字段添加一个 Javadoc 注释。该字段与指定的表相关，并用于保存指定列的值。
      */
     @Override
     public void addFieldComment(Field field, IntrospectedTable introspectedTable) {
-        if (this.suppressAllComments|| !addRemarkComments) {
+        if (this.suppressAllComments || !addRemarkComments) {
             return;
         }
         field.addJavaDocLine("/**"); //
         //添加数据库对应字段与表信息
-        field.addJavaDocLine(" *  <p> Table:" + introspectedTable.getFullyQualifiedTable() + "</p>");
-        if (!suppressDate){
+        field.addJavaDocLine(" *  <p> 表:" + introspectedTable.getFullyQualifiedTable() + "</p>");
+        if (!suppressDate) {
             //添加对应时间
-            field.addJavaDocLine(" *  <p> AddTime:" + DateUtils.getStringCurrentDate() + "</p>");
+            field.addJavaDocLine(" *  <p> 时间:" + DateUtils.getStringCurrentDate() + "</p>");
         }
 
         field.addJavaDocLine(" */"); //$NON-NLS-1$
@@ -144,21 +146,34 @@ public class BaseEnHanceCommentGenerator extends DefaultCommentGenerator {
     }
 
     /**
-     * Adds a comment for a model class.  The Java code merger should
-     * be notified not to delete the entire class in case any manual
-     * changes have been made.  So this method will always use the
-     * "do not delete" annotation.
+     * Function name:    addModelClassComment<br>
+     * Params:<br>
      *
-     * <p>Because of difficulties with the Java file merger, the default implementation
-     * of this method should NOT add comments.  Comments should only be added if
-     * specifically requested by the user (for example, by enabling table remark comments).
-     * <p>
-     * param topLevelClass     the top level class
-     * param introspectedTable the introspected table
+     * @param topLevelClass     the the top level class<br>
+     * @param introspectedTable the introspected table<br>
+     *                          Inside the function:<br>
+     *                          自定义类注释。
      */
     @Override
     public void addModelClassComment(TopLevelClass topLevelClass, IntrospectedTable introspectedTable) {
-        super.addModelClassComment(topLevelClass, introspectedTable);
+        if (suppressAllComments || !addRemarkComments) {
+            return;
+        }
+        topLevelClass.addJavaDocLine("/**"); //$NON-NLS-1$
+        String remarks = CommentUtils.
+                formatRemarks(this.addRemarkComments, introspectedTable.getRemarks());
+        String s = "* 项目名称:<br> "
+                + "* 程序名称:<br>"
+                + "* 日期:" + DateUtils.getStringCurrentDate() + "<br>"
+                + "* 作者:" + System.getProperty("user.name") + "<br>"
+                + "* 模块:" + introspectedTable.getFullyQualifiedTable() + "<br>"
+                + "* 描述:" + remarks + "<br>";
+
+        topLevelClass.addJavaDocLine(s);
+
+        topLevelClass.addJavaDocLine(" */"); //
+        // super.addModelClassComment(topLevelClass, introspectedTable);
+
     }
 
     /**
@@ -180,6 +195,9 @@ public class BaseEnHanceCommentGenerator extends DefaultCommentGenerator {
      */
     @Override
     public void addClassComment(InnerClass innerClass, IntrospectedTable introspectedTable) {
+        if (suppressAllComments || !addRemarkComments) {
+            return;
+        }
         super.addClassComment(innerClass, introspectedTable);
     }
 
@@ -206,15 +224,23 @@ public class BaseEnHanceCommentGenerator extends DefaultCommentGenerator {
         super.addEnumComment(innerEnum, introspectedTable);
     }
 
+
     /**
-     * Adds the getter comment.
+     * Function name:    addGetterComment<br>
+     * Inside the function:<br>
+     * getter注释<br>
+     * Params:<br>
      *
-     * @param method             the method
-     * @param introspectedTable  the introspected table
-     * @param introspectedColumn the introspected column
+     * @param method             the method<br>
+     * @param introspectedTable  the introspected table<br>
+     * @param introspectedColumn the introspected column<br>
      */
     @Override
     public void addGetterComment(Method method, IntrospectedTable introspectedTable, IntrospectedColumn introspectedColumn) {
+        if (suppressAllComments) {
+            return;
+        }
+
         super.addGetterComment(method, introspectedTable, introspectedColumn);
     }
 
@@ -227,6 +253,10 @@ public class BaseEnHanceCommentGenerator extends DefaultCommentGenerator {
      */
     @Override
     public void addSetterComment(Method method, IntrospectedTable introspectedTable, IntrospectedColumn introspectedColumn) {
+        if (suppressAllComments) {
+            return;
+        }
+
         super.addSetterComment(method, introspectedTable, introspectedColumn);
     }
 
@@ -240,42 +270,42 @@ public class BaseEnHanceCommentGenerator extends DefaultCommentGenerator {
      */
     @Override
     public void addGeneralMethodComment(Method method, IntrospectedTable introspectedTable) {
-        if (suppressAllComments|| !addRemarkComments) {
+        if (suppressAllComments || !addRemarkComments) {
             return;
         }
         String remarks = introspectedTable.getRemarks();
         if (addRemarkComments && StringUtility.stringHasValue(remarks)) {
             method.addJavaDocLine("/**"); //$NON-NLS-1$
             if ("insert".equalsIgnoreCase(method.getName())) {
-                method.addJavaDocLine(" * " + "<p>新增对象-"+introspectedTable.getRemarks()+"</p>");
+                method.addJavaDocLine(" * " + "<p>新增对象-" + introspectedTable.getRemarks() + "</p>");
             }
             if ("insertSelective".equalsIgnoreCase(method.getName())) {
-                method.addJavaDocLine(" * " + "<p>选择性新增对象-"+introspectedTable.getRemarks()+"</p>");
+                method.addJavaDocLine(" * " + "<p>选择性新增对象-" + introspectedTable.getRemarks() + "</p>");
 
             }
             if ("selectByPrimaryKey".equalsIgnoreCase(method.getName())) {
-                method.addJavaDocLine(" * " + "<p>根据主键查询 - " + introspectedTable.getRemarks()+"</p>");
+                method.addJavaDocLine(" * " + "<p>根据主键查询 - " + introspectedTable.getRemarks() + "</p>");
 
             }
             if ("selectByExample".equalsIgnoreCase(method.getName())) {
-                method.addJavaDocLine(" * " + "<p>根据条件查询 - " + introspectedTable.getRemarks()+"</p>");
+                method.addJavaDocLine(" * " + "<p>根据条件查询 - " + introspectedTable.getRemarks() + "</p>");
 
             }
             if ("updateByPrimaryKeySelective".equalsIgnoreCase(method.getName())) {
 
-                method.addJavaDocLine(" * " + "<p>根据主键选择性更新 - " + introspectedTable.getRemarks()+"</p>");
+                method.addJavaDocLine(" * " + "<p>根据主键选择性更新 - " + introspectedTable.getRemarks() + "</p>");
 
             }
             if ("updateByExampleSelective".equalsIgnoreCase(method.getName())) {
-                method.addJavaDocLine(" * " + "<p>根据条件选择性更新 - " + introspectedTable.getRemarks()+"</p>");
+                method.addJavaDocLine(" * " + "<p>根据条件选择性更新 - " + introspectedTable.getRemarks() + "</p>");
             }
 
             if ("updateByExampleSelective".equalsIgnoreCase(method.getName())) {
-                method.addJavaDocLine(" * " + "<p>根据条件选择性更新 - " + introspectedTable.getRemarks()+"</p>");
+                method.addJavaDocLine(" * " + "<p>根据条件选择性更新 - " + introspectedTable.getRemarks() + "</p>");
             }
 
             if ("updateByExample".equalsIgnoreCase(method.getName())) {
-                method.addJavaDocLine(" * " + "<p>根据条件更新 - " + introspectedTable.getRemarks()+"</p>");
+                method.addJavaDocLine(" * " + "<p>根据条件更新 - " + introspectedTable.getRemarks() + "</p>");
             }
             if ("deleteByExample".equalsIgnoreCase(method.getName())) {
                 method.addJavaDocLine(" * " + "根据条件删除 - " + introspectedTable.getRemarks());
@@ -288,12 +318,12 @@ public class BaseEnHanceCommentGenerator extends DefaultCommentGenerator {
                 method.addJavaDocLine(" * " + "根据条件查询数量 - " + introspectedTable.getRemarks());
             }
 
-            if (!suppressDate){//添加对应时间
-                method.addJavaDocLine(" *  <p> 添加时间:" + DateUtils.getStringCurrentDate() + "</p>");
+            if (!suppressDate) {//添加对应时间
+                method.addJavaDocLine(" *  <p>时间:" + DateUtils.getStringCurrentDate() + "</p>");
             }
-            method.addJavaDocLine(" * " + "<p>表:-"+introspectedTable.getFullyQualifiedTable()+"</p>");
+            method.addJavaDocLine(" * " + "<p>表:" + introspectedTable.getFullyQualifiedTable() + "</p>");
             method.addJavaDocLine(" */"); //$NON-NLS-1$
-           // super.addGeneralMethodComment(method, introspectedTable);
+            // super.addGeneralMethodComment(method, introspectedTable);
         }
 
     }

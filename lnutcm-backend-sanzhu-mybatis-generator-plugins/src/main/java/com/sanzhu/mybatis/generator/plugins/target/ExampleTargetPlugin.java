@@ -29,10 +29,10 @@ public class ExampleTargetPlugin extends PluginAdapter {
     private String targetPackage;
 
     /**
-     * Function name:initialized<br>
+     * Function name:validate<br>
      * Inside the function:<br>
-     *                 方法在对内省表调用getGeneratedXXXFiles方法之前调用的。<br>
-     *                 插件可以实现此方法来覆盖任何默认属性，或更改数据库的结果内省，在任何代码生成活动发生之前。<br>
+     *                 方法在对内省表调用setXXX方法之后调用的。<br>
+     *                 判断该插件是否能够生效。<br>
      * return:boolean<br>
      * Params:<br>
      * @param warnings List<String> (向列表中添加字符串以指定警告。例如，如果<br>

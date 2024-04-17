@@ -28,7 +28,17 @@ import static org.mybatis.generator.internal.util.messages.Messages.getString;
 public class RenameSqlMapperPlugin extends PluginAdapter {
     private String replaceString;
     private Pattern pattern;
+    /**
+     * Function name:validate<br>
+     * Inside the function:<br>
+     *                 方法在对内省表调用setXXX方法之后调用的。<br>
+     *                 判断该插件是否能够生效。<br>
+     * return:boolean<br>
+     * Params:<br>
+     * @param warnings List<String> (向列表中添加字符串以指定警告。例如，如果<br>
+     *                 插件无效，您应该指定原因。警告为在运行完成后报告给用户)<br>
 
+     */
     @Override
     public boolean validate(List<String> warnings)  {
 
