@@ -1,6 +1,7 @@
 package com.sanzhu.mybatis.generator.plugins.rename;
 
 
+import com.alibaba.fastjson2.JSONObject;
 import com.sanzhu.mybatis.generator.plugins.utils.CommentUtils;
 import org.mybatis.generator.api.IntrospectedColumn;
 import org.mybatis.generator.api.IntrospectedTable;
@@ -13,7 +14,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
-
 
 
 /**
@@ -59,13 +59,13 @@ public class GenerateSpringDocPlugin extends PluginAdapter {
     /**
      * Function name:validate<br>
      * Inside the function:<br>
-     *                 方法在对内省表调用setXXX方法之后调用的。<br>
-     *                 判断该插件是否能够生效。<br>
+     * 方法在对内省表调用setXXX方法之后调用的。<br>
+     * 判断该插件是否能够生效。<br>
      * return:boolean<br>
      * Params:<br>
+     *
      * @param warnings List<String> (向列表中添加字符串以指定警告。例如，如果<br>
      *                 插件无效，您应该指定原因。警告为在运行完成后报告给用户)<br>
-
      */
 
     @Override
@@ -73,7 +73,11 @@ public class GenerateSpringDocPlugin extends PluginAdapter {
 
         this.suppressSpringDocAnnotation = StringUtility.isTrue
                 (properties.getProperty("suppressAnnotation")); //是否抑制Swagger注解
+        logger.info("Swagger注释组件:validate--是否抑制Swagger注解-设置--{}",
+                JSONObject.toJSONString(this.suppressSpringDocAnnotation));
         boolean valid = !suppressSpringDocAnnotation;//判断是否抑制注解
+        logger.info("Swagger注释组件:validate--是否抑制Swagger注解--判断结果{}",
+                JSONObject.toJSONString(valid));
         return valid;
     }
 
@@ -99,26 +103,26 @@ public class GenerateSpringDocPlugin extends PluginAdapter {
                                        IntrospectedColumn introspectedColumn,
                                        IntrospectedTable introspectedTable,
                                        ModelClassType modelClassType) {
-       var annotation="";
+        var annotation = "";
 
         if (introspectedColumn.getRemarks() != null) {
             var remarks = CommentUtils.
                     formatRemarks(true, introspectedColumn.getRemarks());//格式化注释
-         annotation="@Schema(name=\"" + field.getName()+
-                "\"" + " " + "description=" + "\""+remarks
-                + "\""+ " "
-                + ")";
-         if(!introspectedColumn.isNullable()){
-             annotation="@Schema(name=\"" + field.getName()+
-                     "\"" + " " + "description=" + "\""+remarks
-                     + "\""+ " requiredMode= Schema.RequiredMode.REQUIRED"
-                     + ")";
+            annotation = "@Schema(name=\"" + field.getName() +
+                    "\"" + " " + "description=" + "\"" + remarks
+                    + "\"" + " "
+                    + ")";
+            if (!introspectedColumn.isNullable()) {
+                annotation = "@Schema(name=\"" + field.getName() +
+                        "\"" + " " + "description=" + "\"" + remarks
+                        + "\"" + " requiredMode= Schema.RequiredMode.REQUIRED"
+                        + ")";
 
-         }
+            }
         }
         field.addAnnotation(annotation);
         //topLevelClass.addImportedType
-         //       (new FullyQualifiedJavaType(API_MODEL_SCHEMA_FULL_CLASS_NAME));
+        //       (new FullyQualifiedJavaType(API_MODEL_SCHEMA_FULL_CLASS_NAME));
         //introspectedColumn.isNullable()
         // @Schema(name="employeeId" ,description="雇员ID" ,type="Long", requiredMode= Schema.RequiredMode.REQUIRED)
         return super.modelFieldGenerated(field, topLevelClass, introspectedColumn, introspectedTable, modelClassType);
@@ -147,13 +151,12 @@ public class GenerateSpringDocPlugin extends PluginAdapter {
                 formatRemarks(true, introspectedTable.getRemarks());//格式化注释
         topLevelClass.
                 addAnnotation("@Schema(name=\"" + topLevelClass.getClass().getName() +
-                        "\"" + " " + "description=" + "\""+remarks
+                        "\"" + " " + "description=" + "\"" + remarks
                         + "\"");//在类上加上注解@Schema
         topLevelClass.addImportedType
                 (new FullyQualifiedJavaType(API_MODEL_SCHEMA_FULL_CLASS_NAME));
         return super.modelBaseRecordClassGenerated(topLevelClass, introspectedTable);
     }
-
 
 
 }

@@ -163,7 +163,7 @@ public class BaseEnHanceCommentGenerator extends DefaultCommentGenerator {
         String remarks = CommentUtils.
                 formatRemarks(this.addRemarkComments, introspectedTable.getRemarks());
         String s = "* 项目名称:<br> "
-                + "* 程序名称:<br>"
+                + "* 程序名称:"+"<br>"
                 + "* 日期:" + DateUtils.getStringCurrentDate() + "<br>"
                 + "* 作者:" + System.getProperty("user.name") + "<br>"
                 + "* 模块:" + introspectedTable.getFullyQualifiedTable() + "<br>"
@@ -245,11 +245,14 @@ public class BaseEnHanceCommentGenerator extends DefaultCommentGenerator {
     }
 
     /**
-     * Adds the setter comment.
+     * Function name:    addSetterComment<br>
+     * Inside the function:<br>
+     * setter  注释<br>
+     * Params:<br>
      *
-     * @param method             the method
-     * @param introspectedTable  the introspected table
-     * @param introspectedColumn the introspected column
+     * @param method             the method<br>
+     * @param introspectedTable  the introspected table<br>
+     * @param introspectedColumn the introspected column<br>
      */
     @Override
     public void addSetterComment(Method method, IntrospectedTable introspectedTable, IntrospectedColumn introspectedColumn) {

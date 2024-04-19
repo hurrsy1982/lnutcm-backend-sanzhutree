@@ -1,5 +1,7 @@
 package com.sanzhu.mybatis.generator.plugins.utils;
 
+import com.google.common.base.Splitter;
+import com.google.common.collect.Lists;
 import org.mybatis.generator.api.IntrospectedColumn;
 import org.mybatis.generator.api.IntrospectedTable;
 import org.mybatis.generator.api.dom.OutputUtilities;
@@ -64,128 +66,55 @@ public class XmlElementTools {
         return result;
     }
 
-    public static void buildUpdateByExampleElement
-            (String statementId, IntrospectedTable introspectedTable, List<IntrospectedColumn> columns,
-             Context context, String columnName
-                    , String defaultValue, XmlElement element) {
-        // XmlElement answer = new XmlElement("update"); //$NON-NLS-1$
-        //  answer.addAttribute(new Attribute("id", statementId)); //$NON-NLS-1$
-        // answer.addAttribute(new Attribute("parameterType", "map")); //$NON-NLS-1$ //$NON-NLS-2$
-        // context.getCommentGenerator().addComment(answer);
 
-        StringBuilder sb = new StringBuilder();
-        sb.append("update "); //$NON-NLS-1$
-        sb.append(introspectedTable.getAliasedFullyQualifiedTableNameAtRuntime());
-        element.addElement(new TextElement(sb.toString()));
+    /**
+     * Function name:getSetTextElements<br>
+     * Inside the function:<br>
+     *                    方法获取 update 语句中 所有 set 节点之后 where 节点之前的 TextElement <br>
+     *                     遍历所有TextElement 对象, 把所有符合条件的TextElement对象放入列表中，返回列表。<br>
+     * return:ArrayList<TextElement><br>
+     * Params:<br>
+     *
+     * @param   element  XmlElement
+     */
 
-        // set up for first column
-        sb.setLength(0);
-        sb.append("set "); //$NON-NLS-1$
+    public static ArrayList<TextElement> getSetTextElements(XmlElement element) {
+        var results=new ArrayList<TextElement>();
+        for(VisitableElement visitableElement: element.getElements()){//寻找where 条件的位置
 
-        Iterator<IntrospectedColumn> iter = ListUtilities
-                .removeGeneratedAlwaysColumns(columns).iterator();
-        while (iter.hasNext()) {
-            IntrospectedColumn introspectedColumn = iter.next();
-
-            sb.append(MyBatis3FormattingUtilities.getAliasedEscapedColumnName(introspectedColumn));
-            sb.append(" = "); //$NON-NLS-1$
-            if (introspectedColumn.getActualColumnName().equalsIgnoreCase(columnName)) {
-                sb.append(defaultValue);
-            } else {
-                sb.append(MyBatis3FormattingUtilities.getParameterClause(introspectedColumn, "row.")); //$NON-NLS-1$
-            }
-            if (iter.hasNext()) {
-                sb.append(',');
-            }
-
-            element.addElement(new TextElement(sb.toString()));
-
-            // set up for the next column
-            if (iter.hasNext()) {
-                sb.setLength(0);
-                OutputUtilities.xmlIndent(sb, 1);
+            if(visitableElement instanceof TextElement textElement){
+                if(textElement.getContent().contains("update")
+                        || textElement.getContent().contains("UPDATE")){continue;}
+                if(textElement.getContent().contains("where")
+                        || textElement.getContent().contains("WHERE")  ){
+                    break;//where 以后的节点不在匹配范围内
+                }
+                results.add(textElement) ;
             }
         }
-
-        element.addElement(getUpdateByExampleIncludeElement(introspectedTable));
-        //return element;
+        return results;
     }
 
-    protected static XmlElement getUpdateByExampleIncludeElement(IntrospectedTable introspectedTable) {
-        XmlElement ifElement = new XmlElement("if"); //$NON-NLS-1$
-        ifElement.addAttribute(new Attribute("test", "example != null")); //$NON-NLS-1$ //$NON-NLS-2$
+    /**
+     * Function name:splitTextElementContents<br>
+     * Inside the function:<br>
+     *                    方法分割Set 条件部分的textElement 中内容，按=分割  <br>
+     *                     (sql 语句  update  aa <br>
+     *                                       set xx=yy,
+     *                                       zz=dd)<br>
+     * return:ArrayList<String><br>
+     * Params:<br>
+     *
+     * @param   textElement  TextElement
+     */
 
-        XmlElement includeElement = new XmlElement("include"); //$NON-NLS-1$
-        includeElement.addAttribute(new Attribute("refid", //$NON-NLS-1$
-                introspectedTable.getMyBatis3UpdateByExampleWhereClauseId()));
-        ifElement.addElement(includeElement);
-
-        return ifElement;
+    public static ArrayList<String> splitSetTextElementContents(TextElement textElement) {
+        Iterable<String> split = Splitter.on('=')
+                .trimResults()//移除结果字符串的前导空白和尾部空白
+                .omitEmptyStrings()//从结果中自动忽略空字符串
+                .split(textElement.getContent());//分割条件字符串
+        return Lists.newArrayList(split);
     }
 
-    public static void buildUpdateByPrimaryKeyElement
-            (String statementId, String parameterType,Context context,
-             IntrospectedTable introspectedTable, List<IntrospectedColumn> columns,XmlElement element) {
-        //XmlElement answer = new XmlElement("update"); //$NON-NLS-1$
-
-        //answer.addAttribute(new Attribute("id", statementId)); //$NON-NLS-1$
-       // answer.addAttribute(new Attribute("parameterType", parameterType)); //$NON-NLS-1$
-
-       // context.getCommentGenerator().addComment(answer);
-
-        StringBuilder sb = new StringBuilder();
-        sb.append("update "); //$NON-NLS-1$
-        sb.append(introspectedTable.getFullyQualifiedTableNameAtRuntime());
-        element.addElement(new TextElement(sb.toString()));
-
-        // set up for first column
-        sb.setLength(0);
-        sb.append("set "); //$NON-NLS-1$
-
-        Iterator<IntrospectedColumn> iter = ListUtilities.removeGeneratedAlwaysColumns(columns).iterator();
-        while (iter.hasNext()) {
-            IntrospectedColumn introspectedColumn = iter.next();
-
-            sb.append(MyBatis3FormattingUtilities.getEscapedColumnName(introspectedColumn));
-            sb.append(" = "); //$NON-NLS-1$
-            sb.append(MyBatis3FormattingUtilities.getParameterClause(introspectedColumn));
-
-            if (iter.hasNext()) {
-                sb.append(',');
-            }
-
-            element.addElement(new TextElement(sb.toString()));
-
-            // set up for the next column
-            if (iter.hasNext()) {
-                sb.setLength(0);
-                OutputUtilities.xmlIndent(sb, 1);
-            }
-        }
-        buildPrimaryKeyWhereClause(introspectedTable).forEach(element::addElement);
-
-        //return answer;
-    }
-
-    public static List<TextElement> buildPrimaryKeyWhereClause(IntrospectedTable introspectedTable) {
-        List<TextElement> answer = new ArrayList<>();
-        boolean first = true;
-        for (IntrospectedColumn introspectedColumn : introspectedTable.getPrimaryKeyColumns()) {
-            String line = "";
-            if (first) {
-                line = "where "; //$NON-NLS-1$
-                first = false;
-            } else {
-                line = "  and "; //$NON-NLS-1$
-            }
-
-            line += MyBatis3FormattingUtilities.getEscapedColumnName(introspectedColumn);
-            line += " = "; //$NON-NLS-1$
-            line += MyBatis3FormattingUtilities.getParameterClause(introspectedColumn);
-            answer.add(new TextElement(line));
-        }
-
-        return answer;
-    }
 
 }
