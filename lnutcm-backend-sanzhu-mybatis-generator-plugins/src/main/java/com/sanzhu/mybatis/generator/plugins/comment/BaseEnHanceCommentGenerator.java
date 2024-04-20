@@ -330,7 +330,6 @@ public class BaseEnHanceCommentGenerator extends DefaultCommentGenerator {
         }
 
     }
-
     /**
      * This method is called to add a file level comment to a generated java file. This method
      * could be used to add a general file comment (such as a copyright notice). However, note
